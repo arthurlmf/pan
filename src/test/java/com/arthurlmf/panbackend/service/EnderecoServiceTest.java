@@ -58,4 +58,12 @@ class EnderecoServiceTest {
         assertTrue(list.contains(new MunicipioVO("Aguaí")));
     }
 
+    @Test
+    void consultarMunicipiosPorEstado_SiglaErrada() {
+
+        List<MunicipioVO> list = service.getMunicipiosPorEstado("SS");
+
+        assertTrue(list.isEmpty());
+    }
+
 }

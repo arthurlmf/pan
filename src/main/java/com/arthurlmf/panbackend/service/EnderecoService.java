@@ -5,6 +5,8 @@ import com.arthurlmf.panbackend.model.Endereco;
 import com.arthurlmf.panbackend.repository.EnderecoRepository;
 import com.arthurlmf.panbackend.vo.EstadoVO;
 import com.arthurlmf.panbackend.vo.MunicipioVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import java.util.*;
 
 @Service
 public class EnderecoService {
+
+    static final Logger logger = LoggerFactory.getLogger(EnderecoService.class);
 
     @Autowired
     private RestTemplate restTemplate;
@@ -39,6 +43,7 @@ public class EnderecoService {
         RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<EstadoVO[]> response = restTemplate.getForEntity(uri, EstadoVO[].class);
+        logger.info("Api estados retornou salvo " + response.toString());
 
         LinkedList<EstadoVO> list = new LinkedList<EstadoVO>(Arrays.asList(response.getBody()));
         EstadoVO sp = list.get(list.indexOf(new EstadoVO("SP")));
@@ -60,6 +65,8 @@ public class EnderecoService {
 
         ResponseEntity<MunicipioVO[]> response = restTemplate.getForEntity(uri, MunicipioVO[].class);
 
+        logger.info("Api municipios retornou salvo " + response.toString());
+
         return Arrays.asList(response.getBody());
     }
 
@@ -67,13 +74,15 @@ public class EnderecoService {
         try {
             Endereco enderecoConsultado = getEnderecoPorCep(endereco.getCep());
             if(enderecoConsultado == null){
+                logger.error("Endereco invalido");
                 throw new PanbackendException("Endereço invalido");
             }
         }catch (HttpClientErrorException e){
+            logger.error("Endereco invalido");
             throw new PanbackendException("Endereço invalido");
         }
 
-
+        logger.info("endereco salvo " + endereco.toString());
         return repository.save(endereco);
     }
 }
